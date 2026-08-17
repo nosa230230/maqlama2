@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>مَقْلَمَة - منصة تعليمية</title>
+<meta name="description" content="منصة تعليمية لإدارة الكورسات والدروس والطلاب" />
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563eb">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-96.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="مَقْلَمَة">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="style.css" />
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+<script src="env.js"></script>
+<script src="pwa-install.js" defer></script>
+</head>
+<body>
+
+<!-- Loading Screen -->
+<div id="loadingScreen" class="loading-screen">
+  <div class="loader">
+    <div class="loader-logo"><i class="fas fa-graduation-cap"></i></div>
+    <div class="loader-text">مَقْلَمَة</div>
+    <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer" class="toast-container"></div>
+
+<!-- Modal Container -->
+<div id="modalRoot"></div>
+
+<!-- Login Page -->
+<section id="loginPage" class="page login-page hidden">
+  <div class="login-wrap">
+    <div class="login-side">
+      <div class="brand">
+        <i class="fas fa-graduation-cap"></i>
+        <h1>مَقْلَمَة</h1>
+      </div>
+      <p class="brand-tag">منصتك التعليمية الحديثة — تعلّم في أي وقت ومن أي مكان.</p>
+      <ul class="login-feats">
+        <li><i class="fas fa-check-circle"></i> كورسات تفاعلية ومحاضرات فيديو</li>
+        <li><i class="fas fa-check-circle"></i> ملفات PDF ومصادر تعليمية</li>
+        <li><i class="fas fa-check-circle"></i> شات مباشر مع المدرسين والزملاء</li>
+        <li><i class="fas fa-check-circle"></i> تتبع تقدّمك ومتابعة إنجازك</li>
+      </ul>
+    </div>
+    <div class="login-card">
+      <div class="login-tabs">
+        <button class="login-tab active" data-tab="student">طالب</button>
+        <button class="login-tab" data-tab="admin">أدمن</button>
+      </div>
+      <h2>تسجيل الدخول</h2>
+      <p class="muted">أهلاً بك من جديد، سجّل دخولك للمتابعة.</p>
+      <form id="loginForm" class="form">
+        <div class="field">
+          <label>البريد الإلكتروني / اسم المستخدم</label>
+          <div class="input-icon">
+            <i class="fas fa-user"></i>
+            <input type="text" id="loginUser" placeholder="اكتب اسم المستخدم" required />
+          </div>
+        </div>
+        <div class="field">
+          <label>كلمة المرور</label>
+          <div class="input-icon">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="loginPass" placeholder="••••••••" required />
+            <button type="button" class="show-pass" data-target="loginPass"><i class="fas fa-eye"></i></button>
+          </div>
+        </div>
+        <div class="field-row">
+          <label class="check"><input type="checkbox" id="rememberMe" checked /> <span>تذكّرني</span></label>
+          <!-- <a href="#" class="link">نسيت كلمة المرور؟</a> -->
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">دخول <i class="fas fa-arrow-left"></i></button>
+        <!-- <div class="hint">
+          <strong>تجريبي:</strong>
+          الأدمن الافتراضي يُنشأ تلقائياً من <code>env.js</code>
+        </div> -->
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- App Shell -->
+<section id="appShell" class="app-shell hidden">
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-head">
+      <div class="brand small">
+        <i class="fas fa-graduation-cap"></i>
+        <span>مَقْلَمَة</span>
+      </div>
+      <button class="icon-btn sidebar-close" id="sidebarClose"><i class="fas fa-xmark"></i></button>
+    </div>
+    <nav class="nav" id="navMenu">
+      <a class="nav-item active" data-view="dashboard"><i class="fas fa-gauge-high"></i><span>الرئيسية</span></a>
+      <a class="nav-item" data-view="courses"><i class="fas fa-book-open"></i><span>الكورسات</span></a>
+      <a class="nav-item" data-view="paths"><i class="fas fa-route"></i><span>المسارات التعليمية</span></a>
+      <a class="nav-item" data-view="chat"><i class="fas fa-comments"></i><span>الشات</span></a>
+      <a class="nav-item" data-view="live"><i class="fas fa-tower-broadcast"></i><span>البث المباشر</span><span class="live-dot" id="liveDot" style="display:none"></span></a>
+      <a class="nav-item admin-only" data-view="students"><i class="fas fa-user-graduate"></i><span>الطلاب</span></a>
+      <a class="nav-item admin-only" data-view="manageCourses"><i class="fas fa-folder-tree"></i><span>إدارة الكورسات</span></a>
+      <a class="nav-item admin-only" data-view="managePaths"><i class="fas fa-diagram-project"></i><span>إدارة المسارات</span></a>
+      <a class="nav-item" data-view="profile"><i class="fas fa-id-badge"></i><span>الملف الشخصي</span></a>
+      <a class="nav-item" data-view="settings"><i class="fas fa-gear"></i><span>الإعدادات</span></a>
+    </nav>
+    <div class="sidebar-foot">
+      <button class="btn btn-ghost btn-block" id="logoutBtn"><i class="fas fa-right-from-bracket"></i> تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <header class="navbar">
+      <button class="icon-btn" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+      <div class="search">
+        <i class="fas fa-search"></i>
+        <input type="text" id="globalSearch" placeholder="ابحث عن كورس، محاضرة..." />
+      </div>
+      <div class="nav-actions">
+        <button class="icon-btn" id="themeToggle" title="الوضع الليلي"><i class="fas fa-moon"></i></button>
+        <div class="bell-wrap">
+          <button class="icon-btn" id="notifBtn"><i class="fas fa-bell"></i><span class="badge" id="notifBadge">0</span></button>
+          <div class="dropdown" id="notifDropdown">
+            <div class="dropdown-head">
+  <strong>الإشعارات</strong>
+
+  <div style="display:flex;gap:10px;align-items:center;">
+    <button class="link" id="markAllRead">قراءة الكل</button>
+    <button class="link" id="clearAllNotifications">مسح الكل</button>
+  </div>
+</div>
+            <div class="dropdown-body" id="notifList"></div>
+          </div>
+        </div>
+        <div class="user-chip" id="userChip">
+          <div class="avatar" id="userAvatar">م</div>
+          <div class="user-meta">
+            <span id="userName">مستخدم</span>
+            <small id="userRole">طالب</small>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="view-wrap" id="viewWrap"></div>
+  </main>
+</section>
+
+<script src="script.js"></script>
+<footer class="site-footer">
+  <div>
+    Design by
+    <a
+      href="https://www.facebook.com/share/195CtvZHs7/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Handala
+    </a>
+  </div>
+</footer>
+</body>
+</html>

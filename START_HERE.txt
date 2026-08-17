@@ -1,0 +1,18 @@
+# مَقْلَمَة — تشغيل النسخة المحلية
+
+1. افتح هذا المجلد في VS Code.
+2. افتح `env.js`.
+3. اترك `SUPABASE_URL` كما هو إذا كنت تستخدم مشروع Supabase الجديد:
+   https://jzayxiejzifikkszwqgc.supabase.co
+4. استبدل `PASTE_NEW_SUPABASE_PUBLISHABLE_KEY_HERE` بالـ Publishable key من:
+   Supabase Dashboard → Project Settings → API Keys.
+5. لا تضع Secret key / service_role في هذا الملف.
+6. بعد ذلك افتح `index.html` بواسطة Live Server في VS Code.
+   - إذا لم يكن Live Server مثبتًا، استخدم Extensions وابحث عن "Live Server".
+   - ثم كليك يمين على `index.html` → Open with Live Server.
+7. قبل تسجيل دخول الأدمن، يجب إنشاء مستخدم Auth في Supabase ثم من SQL Editor تحويله إلى admin حسب تعليمات `SUPABASE_SETUP.md`.
+
+ملاحظة:
+- صور المسارات مستقلة عن صور الكورسات.
+- صور الكورسات مستقلة عن صور المدرسين.
+- لا توجد صور للطلاب.
