@@ -131,9 +131,13 @@ function initLogin() {
     $$('.login-tab').forEach(x=>x.classList.remove('active'));
     t.classList.add('active');
     const isAdmin = t.dataset.tab === 'admin';
-    const adm = ENV.DEFAULT_ADMIN || {};
-    $('#loginUser').value = isAdmin ? (adm.username||'admin') : '';
-    $('#loginPass').value = isAdmin ? (adm.password||'admin1234') : '';
+
+$('#loginUser').value = '';
+$('#loginPass').value = '';
+    // const isAdmin = t.dataset.tab === 'admin';
+    // const adm = ENV.DEFAULT_ADMIN || {};
+    // $('#loginUser').value = isAdmin ? (adm.username||'admin') : '';
+    // $('#loginPass').value = isAdmin ? (adm.password||'admin1234') : '';
   }));
   $$('.show-pass').forEach(b => b.addEventListener('click', () => {
     const input = $('#'+b.dataset.target);
